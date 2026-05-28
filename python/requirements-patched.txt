@@ -1,0 +1,37 @@
+# Patched Wav2Lip requirements for Python 3.10 + PyTorch 2.x + numpy 2.x on
+# Apple Silicon.  Wav2Lip's `requirements.txt` pins versions from 2020
+# (numpy 1.17, torch 1.1, librosa 0.7, opencv-python 4.1, numba 0.48) that
+# do not install under modern Python 3.10 + PyTorch 2.x.  We deliberately
+# leave most pins open so pip can resolve a coherent modern stack, and
+# patch the upstream source for the small API changes that result (see
+# ../python/PATCHES.md).
+#
+# numpy / scipy: provided transitively by torch; left unconstrained.
+# librosa: 0.10.x — works with numpy 2.x; removes deprecated APIs the
+# upstream still calls, so we patch the call sites in audio.py.
+librosa
+soundfile
+
+# numba: 0.48 from the original pin fails to build under Python 3.10.
+# Leave open; resampy / librosa will pull in a compatible version.
+numba
+resampy
+
+# OpenCV — the original pin (4.1.0.25) does not have wheels for Apple
+# Silicon. We let pip pick a current wheel; the API surface Wav2Lip
+# touches (VideoWriter, resize, imread) is stable across versions.
+opencv-contrib-python
+opencv-python
+
+# scipy 1.10+ supports numpy 2.x; leave open.
+scipy
+
+# Wav2Lip imports tqdm, batchnorm via torchvision; leave open.
+tqdm
+
+# `inference.py` uses `torch.load`, `torch.no_grad`, basic CNN ops only;
+# nothing version-locked. We pull a current stable PyTorch wheel via the
+# install script (which runs `pip install torch torchvision torchaudio`
+# ahead of this file) so users get whatever wheel matches their host
+# Python + accelerator. Listing torch here would force pip to resolve a
+# CPU-only wheel, which we do not want.
