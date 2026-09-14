@@ -2,7 +2,7 @@
   description = "GuiAssert-Wav2Lip - Wav2Lip lip-sync plugin for GuiAssert";
 
   inputs = {
-    nixos-modules.url = "github:metacraft-labs/nixos-modules";
+    nixos-modules.url = "github:metacraft-labs/devops-modules";
     nixpkgs.follows = "nixos-modules/nixpkgs-unstable";
     flake-parts.follows = "nixos-modules/flake-parts";
   };
