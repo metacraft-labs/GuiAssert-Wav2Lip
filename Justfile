@@ -11,6 +11,7 @@ default: test
 # Pure unit tests for the plugin.  Compiles against the sibling
 # GuiAssert checkout via --path:../GuiAssert/src.
 test:
+    nim c -r --hints:off --path:src tests/tnimcache_is_worktree_local.nim
     nim c -r --hints:off --path:src --path:../GuiAssert/src tests/twav2lip.nim
 
 # End-to-end live test.  Requires a completed install (.venv + upstream
