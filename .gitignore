@@ -20,6 +20,7 @@ nimblecache/
 *.exe
 *.dSYM
 tests/twav2lip
+tests/tnimcache_is_worktree_local
 
 # Editor / OS noise.
 .DS_Store
