@@ -13,6 +13,9 @@
 
 # Nim build artefacts.
 nimcache/
+# Per-checkout nimcache (config.nims): every Nim compile in this checkout
+# keeps its intermediate files here, never in the shared ~/.cache/nim.
+.nimcache/
 nimblecache/
 *.exe
 *.dSYM
