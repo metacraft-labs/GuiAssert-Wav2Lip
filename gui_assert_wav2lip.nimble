@@ -12,4 +12,5 @@ requires "nim >= 2.0.0"
 # truth.
 
 task test, "Run plugin tests":
+  exec "nim c -r --hints:off --path:src tests/tnimcache_is_worktree_local.nim"
   exec "nim c -r --hints:off --path:src --path:../GuiAssert/src tests/twav2lip.nim"
