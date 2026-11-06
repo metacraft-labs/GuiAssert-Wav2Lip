@@ -1,5 +1,7 @@
 # GuiAssert-Wav2Lip
 
+Implements the talking-head provider contract of [DemoVideoStudio](https://github.com/metacraft-labs/DemoVideoStudio), version 1 (`demo_video_studio/plugins/talking_head`), and runs its conformance kit in `just test` (`tests/tcontract.nim`). Build it next to DemoVideoStudio and GuiAssert checkouts (or set `DEMO_VIDEO_STUDIO_SRC` and `GUI_ASSERT_SRC`).
+
 Wav2Lip lip-sync plugin for [GuiAssert]. Implements GuiAssert's
 `TalkingHeadProvider` contract by shelling out to a local Wav2Lip
 install (a Python 3.10 venv + the `Rudrabha/Wav2Lip` repo at a pinned
@@ -41,13 +43,13 @@ GuiAssert-Wav2Lip/
 
 ## Cost of setup
 
-| Resource     | Approx.                                                |
-| ------------ | ------------------------------------------------------ |
-| Disk         | ~960 MB of weights + ~1.5 GB of Python deps in `.venv` |
-| Network      | ~960 MB on first install (subsequent runs are offline) |
-| Time         | ~5 min on a fresh checkout                             |
-| Dollars      | Zero — Wav2Lip is open source (MIT)                    |
-| API key      | None                                                   |
+| Resource | Approx.                                                |
+| -------- | ------------------------------------------------------ |
+| Disk     | ~960 MB of weights + ~1.5 GB of Python deps in `.venv` |
+| Network  | ~960 MB on first install (subsequent runs are offline) |
+| Time     | ~5 min on a fresh checkout                             |
+| Dollars  | Zero — Wav2Lip is open source (MIT)                    |
+| API key  | None                                                   |
 
 ## Setup
 
@@ -76,25 +78,25 @@ On Linux, install your distribution's `python3.10` package
 
 ### Apple Silicon notes
 
-* Wav2Lip runs on the MPS backend with
+- Wav2Lip runs on the MPS backend with
   `PYTORCH_ENABLE_MPS_FALLBACK=1` (set automatically by the dev-shell
   and the wrapper script). A small number of `aten::*` ops fall back
   to CPU; the bulk of the model runs on the GPU.
-* Typical render speed on an M-series Mac: ~25 it/s on the Wav2Lip
+- Typical render speed on an M-series Mac: ~25 it/s on the Wav2Lip
   generator, ~5 it/s on the s3fd face detector.
-* Upstream Wav2Lip was last touched in 2020 and pins numpy 1.17,
+- Upstream Wav2Lip was last touched in 2020 and pins numpy 1.17,
   torch 1.1, librosa 0.7, opencv-python 4.1, none of which install
   under Python 3.10 on Apple Silicon. We patch the source for the
   small API changes that modern numpy 2.x / librosa 0.10 / PyTorch
   2.x require — see `python/PATCHES.md` for the full manifest.
-* PyTorch 2.6+ flipped the default of `torch.load(weights_only=...)`
+- PyTorch 2.6+ flipped the default of `torch.load(weights_only=...)`
   to `True`, which breaks the pre-2.6 state-dict pickles Wav2Lip
   ships. Patch (5) in `PATCHES.md` flips it back.
 
 ## Wiring into a runner
 
 ```nim
-import gui_assert/talking_head
+import demo_video_studio/plugins/talking_head
 import gui_assert_wav2lip
 
 let reg = newRegistry()         # registry pre-populated with `stock_avatar`
@@ -111,20 +113,20 @@ generateTalkingHead(reg, "wav2lip", narrationWav, outputMp4, opts)
 Path discovery uses three environment variables (each with a sensible
 default):
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `GUI_ASSERT_WAV2LIP_HOME` | this repo's root | Override the plugin install location. |
-| `GUI_ASSERT_WAV2LIP_PYTHON` | `<home>/.venv/bin/python` | Override the Python interpreter. |
-| `GUI_ASSERT_WAV2LIP_RENDER_SCRIPT` | `<home>/python/render_lipsync.py` | Override the wrapper script. |
+| Variable                           | Default                           | Purpose                               |
+| ---------------------------------- | --------------------------------- | ------------------------------------- |
+| `GUI_ASSERT_WAV2LIP_HOME`          | this repo's root                  | Override the plugin install location. |
+| `GUI_ASSERT_WAV2LIP_PYTHON`        | `<home>/.venv/bin/python`         | Override the Python interpreter.      |
+| `GUI_ASSERT_WAV2LIP_RENDER_SCRIPT` | `<home>/python/render_lipsync.py` | Override the wrapper script.          |
 
 ## Tests
 
 ```sh
 # Pure tests — always safe to run.
-nim c -r --hints:off --path:src --path:../GuiAssert/src tests/twav2lip.nim
+nim c -r --hints:off --path:src --path:../DemoVideoStudio/src --path:../GuiAssert/src tests/twav2lip.nim
 
 # Live end-to-end — requires the install to have completed.
-nim c -d:wav2lipLive -r --hints:off --path:src --path:../GuiAssert/src tests/twav2lip.nim
+nim c -d:wav2lipLive -r --hints:off --path:src --path:../DemoVideoStudio/src --path:../GuiAssert/src tests/twav2lip.nim
 ```
 
 The live test fails the run if Wav2Lip is not actually available —
